@@ -3,20 +3,25 @@ import PropTypes from 'prop-types';
 
 import MainLayout from '../components/Layouts/Main';
 
-import LightsUi from '../components/LightsUi/LightsUi';
-import WithData from '../components/Machine/WithData';
+//import LightsUi from '../components/LightsUi/LightsUi';
+//import WithData from '../components/Machine/WithData';
+import withAuth from '../server/lib/withAuth';
+
+import MainContainer from '../components/Main/MainContainer';
 import ReconnectSnack from '../components/UI/ReconnectSnack';
 //import ModeSettingsModal from '../components/Settings/ModeSettingsModal';
 
-const Index = function ({data_lights, data_switch, endpoint, socket, settings} ) {
-
+const Index = function (props ) {
+  const { endpoint, socket, settings, user} = props;
+  console.log("Props", props);
     return (
         <MainLayout>
-            <ReconnectSnack data_lights={data_lights} data_switch={data_switch} socket={socket} />
-            {/*<ModeSettingsModal endpoint={endpoint} socket={socket} />*/}
+            {/* <ReconnectSnack data_lights={data_lights} data_switch={data_switch} socket={socket} />
+            
 
 
-            <LightsUi data_lights={data_lights} data_switch={data_switch} socket={socket} endpoint={endpoint}/>
+            <LightsUi data_lights={data_lights} data_switch={data_switch} socket={socket} endpoint={endpoint}/> */}
+            <MainContainer user={user}/>
             
         </MainLayout>
     );
@@ -35,4 +40,5 @@ Index.defaultProps = {
   settings: null,
 };
 
-export default WithData(Index);
+export default withAuth(Index);
+//export default WithData(Index);

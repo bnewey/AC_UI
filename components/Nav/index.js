@@ -11,7 +11,7 @@ import MenuIcon from '@material-ui/icons/Menu';
 
 import {withRouter} from "next/router";
 import NavButton from '../Nav/NavButton';
-
+import {Box, Drawer,List,Divider,ListItem, ListItemIcon, ListItemText} from '@material-ui/core';
 
 /*`
   display: flex;
@@ -19,36 +19,77 @@ import NavButton from '../Nav/NavButton';
 `*/
 
 const Nav = (props) => {
+  const {user} = props;
 
   const useStyles = makeStyles(theme => ({
     root: {
       display: 'flex',
-      background: '#0968cf',
-
+      background: '#4bb2b4',
+      boxShadow: 'inset 0px 2px 4px -1px rgba(0,0,0,0.2), inset 0px 4px 5px 0px rgba(0,0,0,0.14), inset 0px 1px 10px 0px rgba(0,0,0,0.12)'
+    },
+    toolbar: {
+      minHeight: '40px',
     },
     button: {
       cursor: 'pointer',
       
+    },
+    list:{
+
+    },
+    listItem:{
+      border: '1px solid #ececec',
+      padding: '0% 20%'
     }
     
    
   }));
+
+  const [drawerOpen, setDrawerOpen] = React.useState(false);
+  const handleOpenDrawer = (event) =>{
+    setDrawerOpen(true);
+  }
+
+  const closeDrawer = (event) =>{
+    setDrawerOpen(false);
+  }
 
   //only works inside a functional component
   const classes = useStyles();
 
   return(
   <AppBar position="static" classes={{root: classes.root}}>
-    <Toolbar>
-          <IconButton edge="start" color="inherit" aria-label="menu">
+    <Toolbar className={classes.toolbar}>
+          <Box display={{ xs: 'inline', md: 'none' }}  component="span">
+          <IconButton edge="start" color="inherit" aria-label="menu" onClick={event=> handleOpenDrawer(event)}>
             <MenuIcon />
           </IconButton>
+          <Drawer anchor={'left'} open={drawerOpen} onClose={event => closeDrawer(event)}>
+            <List className={classes.list}>
+                {props.navButtons.filter((item)=> {
+                   if(item.adminOnly){
+                      if(user?.isAdmin ){
+                        return true;
+                      }else{
+                        return false
+                      }
+                    }
+                    return true;
+                }).map((button,i) => (
+                  <ListItem key={`button_${i}`} className={classes.listItem}>
+                      <Link href={button.path} as={`/${button.path}`}><h3>{button.label}</h3></Link>
+                  </ListItem>
+                ))}
+            </List>
+          </Drawer>
+          </Box>
           {props.navButtons.map(button => (
+            <Box display={{ xs: 'none', md: 'inline' }}  component="span">
           <NavButton className={classes.button}
             key={button.path}
             path={button.path}
             label={button.label}
-          />
+          /></Box>
           ))}
         </Toolbar>    
   </AppBar>

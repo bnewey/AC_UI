@@ -11,11 +11,8 @@ class MyDocument extends Document {
       <html lang="en" dir="ltr">
         <Head>
           <meta charSet="utf-8" />
-          {/* Use minimum-scale=1 to enable GPU rasterization */}
-          <meta
-            name="viewport"
-            content="minimum-scale=1, initial-scale=1, width=device-width, shrink-to-fit=no"
-          />
+          <meta name='description' content='AC_Heat App for Rainey Electronics Inc' />
+          <meta name='keywords' content='AC_Heat rainey electronics' />
           {/* PWA primary color */}
           <meta
             name="theme-color"
@@ -23,12 +20,26 @@ class MyDocument extends Document {
               pageContext ? pageContext.theme.palette.primary.main : null
             }
           />
+          <link rel="manifest" href="/static/manifest.json"/>
+
+          <meta name="mobile-web-app-capable" content="yes"/>
+          <meta name="apple-mobile-web-app-capable" content="yes"/>
+          <meta name="application-name" content="AC_Heat"/>
+          <meta name="apple-mobile-web-app-title" content="AC_Heat"/>
+          <meta name="theme-color" content="#4bb2b4"/>
+          <meta name="msapplication-navbutton-color" content="#4bb2b4"/>
+          <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+          <meta name="msapplication-starturl" content="/scheduling"/>
+          <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
+
+          <link rel="icon" type="png" sizes="48x48" href="/static/favicon.ico"/>
+          <link rel="apple-touch-icon" type="png" sizes="48x48" href="/static/favicon.ico"/>
           <link
-            rel="stylesheet"
-            href="https://fonts.googleapis.com/css?family=Roboto:300,400,500"
+            rel="stylesheet" type='text/css'
+            href="/static/fonts.css"
           />
           <link rel="stylesheet" type="text/css" href="/static/nprogress.css" />
-
+          <link rel="stylesheet" type="text/css" href="/static/styles.css" />
           <link rel="stylesheet" type="text/css" href="/static/react-confirm-alert.css" />
           {/* we could add global styles here */ }
         </Head>

@@ -21,7 +21,19 @@ const getSocket = function(socketId){
 exports.setupIo = function(server, HOST, SOCKET_PORT){
     
     //Socket IO | sends data from node server to next frontend
-    io = socketIo(server);
+    io = socketIo(server, {
+       
+        origins: ["*:*"],
+        handlePreflightRequest: (req, res) => {
+            res.writeHead(200, {
+              "Access-Control-Allow-Origin": "*",
+              "Access-Control-Allow-Methods": "GET,POST",
+              "Access-Control-Allow-Headers": "my-custom-header",
+              "Access-Control-Allow-Credentials": true
+            });
+            res.end();
+        }
+    });
 
     io.on("connection", socket => {
         logger.verbose(`New client connected. Socket #${socket.id} `);
@@ -57,7 +69,7 @@ var client = new net.Socket();
 
 exports.setupTCP = function(HOST, SOCKET_PORT, database) {
 
-    function makeConnection () {
+    function makeConnection() {
         
         client.connect(SOCKET_PORT, HOST, function() {
             
@@ -74,7 +86,7 @@ exports.setupTCP = function(HOST, SOCKET_PORT, database) {
         logger.info('drain');
     }
 
-    function closeEventHandler () {
+    function closeEventHandler() {
         
         client.destroy();
         if (!retrying) {

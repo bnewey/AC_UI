@@ -1,30 +1,27 @@
 import Head from 'next/head'
-import Wrapper from '../Machine/Wrapper'
+import Wrapper from './Wrapper'
 import Nav from '../Nav';
 import StyledFooter from '../Footer'
 import navButtons from "../../config/buttons";
-import { Component } from 'react';
+
+import {makeStyles } from '@material-ui/core/styles';
 
 import {styled} from '@material-ui/core/styles';
 
 const StyledNav = styled(Nav)({
   display: 'flex',
-  background: '#0968cf',
+  background: '#414d5a',
 });
 
 
 
 
- export default class Layout extends React.Component {
-    constructor(props){
-      super(props);
-    }
+const Layout = (props) => {
 
-
-
-   render(){
-      const {children} = this.props;
-      const title = "Lights Control";
+      const {children} = props;
+      const title = "REI AC/HEAT";
+      //CSS
+      const classes = useStyles();
 
       return (
         <Wrapper>
@@ -32,22 +29,23 @@ const StyledNav = styled(Nav)({
             <title>{title}</title>
             
           </Head>
-          <header>
-            
-            <StyledNav navButtons={navButtons} />
-          </header>
-          
           <main className='main-wrapper'>
             { children }
-            <style jsx>{`
-                margin: 0% 5% 2% 5%
-            `}</style>
+            {/* <style jsx>{`
+                margin: 0% 3% 1% 3%
+            `}</style> */}
           </main>
-      
           <StyledFooter />
           
         </Wrapper>
     );
   }
-}
 
+  export default Layout;
+
+
+const useStyles = makeStyles(theme => ({
+  root:{
+
+  }
+}));

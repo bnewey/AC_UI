@@ -1,0 +1,22 @@
+{
+    "name": "REI AC/Heat",
+    "short_name": "AC/Heat",
+    "lang": "en-US",
+    "start_url": "https://icontrol.raineyelectronics.com/scheduling/",
+    "display": "standalone",
+    "theme_color": "#4bb2b4",
+    "background_color": "#fff",
+    "icons": [
+      {
+        "src": "/static/maskable_icon_x192.png",
+        "sizes": "192x192",
+        "type": "image/png",
+        "purpose": "any maskable"
+      },
+      {
+        "src": "/static/rainey_elec.png",
+        "sizes": "512x512",
+        "type": "image/png"
+      }
+    ]
+  }

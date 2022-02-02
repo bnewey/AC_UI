@@ -8,16 +8,22 @@ const http = require("http");
 const favicon = require('serve-favicon');
 const cors = require('cors');
 const dotenv = require('dotenv');
+const { parse } = require('url')
 const bodyParser = require('body-parser')
+
+const session = require('express-session');
+const MySQLStore = require('express-mysql-session')(session);
+const auth = require('./google');
 
 const {setupIo, setupTCP} = require('./sockets'); 
 
 dotenv.config();
 const app = express();
+app.use(cors({ origin: '*' }));
 const server = http.createServer(app);
 
 //Create and maintain socket connections..
-const HOST = '10.0.0.109'; //for c++ socket
+const HOST = 'ac-heat.com'//'10.0.0.109'; //for c++ socket
 const SOCKET_PORT = 8081; //for c++ socket
 
 //Handle Database
@@ -33,10 +39,13 @@ const nextApp = next({ dev });
 const handle = nextApp.getRequestHandler();
 
 //var machines = require('./api/machines/machines');
-const switch_route = require('./lib/switch.js');
-const light_route = require('./lib/light.js');
+const conditioningUnits_route = require('./lib/conditioningUnits.js');
+const zones_route = require('./lib/zones.js');
+//const webPush = require('./lib/webPush');
+//const notifications = require('./lib/notifications.js');
 
 global.SERVER_APP_ROOT = __dirname;
+global.ROOT_URL =  `http://ac-heat.com:${process.env.PORT}`;
 
 nextApp
   .prepare()
@@ -46,44 +55,80 @@ nextApp
     app.use(expressValidator());
     app.use(bodyParser.json({limit: '50mb'}));
 
-    //app.use('/api/machines', machines);
+    // The next two gets allow normal handle of regular static/next assets
+    //   that do not need google auth. This needs to be before passport.session
+    app.get('/_next*', (req, res) => {
+      handle(req, res);
+    });
+
+    app.get('/static/*', (req, res) => {
+      handle(req, res);
+    });
+    ////////////////
+
     
-    app.use(cors({ origin: '*' }));
+    //Custom Routes//
+    app.use('/conditioningUnits', conditioningUnits_route);
+    app.use('/zones', zones_route);
+    //app.use('/scheduling/notifications', notifications.router);
+    //app.use('/webPush', webPush.router);
+    ///
 
-    app.use('/switch', switch_route);
-    app.use('/light', light_route);
+    //Session   ////
+    //Has to be above custom routes, otherwise req.session is not available to them
+    var options = {
+      host: process.env.host,
+      port: 3306,
+      user: process.env.user,
+      password: process.env.password,
+      database: process.env.database,
+      expiration: (14 * 24 * 60 * 60)
+    };
+    
+    var sessionStore = new MySQLStore(options);
+    //Could use existing connection like this 
+    //var sessionStore = new MySQLStore({}/* session store options */, connection);
+    
+    app.use(session({
+        name: 'ac_heat.sid',
+        secret: 'HD2w.)q*VqRT4/#NK2M/,E^B)}FED5fWU!dKe[wk',
+        resave: false,
+        saveUninitialized: false,
+        cookie: {
+          httpOnly: true,
+          maxAge: 14 * 24 * 60 * 60 * 1000,
+        }, 
+        key: 'session_cookie_name',
+        store: sessionStore,
+    }));
+    /////////////////
+    // Authenticate User
+    auth({ ROOT_URL, app ,database})
 
-    //This is how we can send variables like settings from mysql to nextjs
-    // var settings = require('./settings.js');
-    // app.get('/', (req, res) => {
+    // Custom Routes with session
+      //Place vehicles here, because we need to access session.passport.user 
 
-    //   settings.doGetAll(nextApp, database,req,res);
-      
-    //   //settings.handleRequest(nextApp, database, req, res);
-    // });
-
-    // app.get('/api/history', async (req,res) => {
-    //   const sql = 'Select * from air_dryer ORDER BY read_date DESC';
-    //   try{
-    //     const results = await database.query(sql, []);
-    //     logger.info("Got History");
-    //     res.json(results);
-    //   }
-    //   catch(error){
-    //     logger.error("History: " + err);
-    //     res.send("");
-    //   }
-    // });
+      //
 
     app.get('*', (req, res) => {
-      return handle(req, res);
+      const parsedUrl = parse(req.url, true)
+      const { pathname } = parsedUrl;
+
+      if (pathname === '/sw.js' || pathname.startsWith('/workbox-')) {
+        console.log("SW or Worker");
+        const filePath = path.join(__dirname, '/../public', pathname)
+        logger.info(filePath);
+        nextApp.serveStatic(req, res, filePath)
+      } else {
+        handle(req, res, parsedUrl)
+      }
+      //return handle(req, res);
     });
 
     server.listen(PORT, err => {
       if (err) throw err;
-      logger.info(`> Ready on 10.0.0.109:${PORT}`);
+      logger.info(`> Ready on localhost:${PORT}`);
     });
-
 
   })
   .catch(ex => {

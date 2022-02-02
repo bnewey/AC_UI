@@ -7,9 +7,9 @@ import { createGenerateClassName } from "@material-ui/styles";
 const theme = createMuiTheme({
   palette: {
     primary: {
-      light: '#0968cf',
-      main: '#0968cf',
-      dark: '#0968cf'
+      light: '#414d5a',
+      main: '#414d5a',
+      dark: '#414d5a'
     },
     secondary: {
       light: '#b7c3cd',
@@ -18,6 +18,9 @@ const theme = createMuiTheme({
     },
     type: 'light',
   },
+  typography: {
+    fontSize: 11,
+  }
 });
 
 function createPageContext() {

@@ -13,7 +13,7 @@ import LinearProgress from '@material-ui/core/LinearProgress';
 
 
 import { textAlign } from '@material-ui/system';
-import Switch from '../../js/Switch';
+import ConditioningUnits from '../../js/ConditioningUnits';
 
 import cogoToast from 'cogo-toast';
 
